@@ -74,7 +74,7 @@ export default [
     },
 
     {
-        path: '/jobs/:type',
+        path: '/jobs/:type(pending|completed|silenced)',
         children: [
             {
                 path: '',
@@ -83,10 +83,15 @@ export default [
             },
             {
                 path: ':jobId',
-                name: 'job-preview',
+                name: 'job-preview-typed',
                 component: recentJobsJob,
             },
         ],
+    },
+    {
+        path: '/jobs/:jobId',
+        name: 'job-preview',
+        component: recentJobsJob,
     },
 
     {
