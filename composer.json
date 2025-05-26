@@ -1,5 +1,5 @@
 {
-    "name": "laravel/horizon",
+    "name": "ajaska-gmbh/horizon-extended",
     "description": "Dashboard and code-driven configuration for Laravel queues.",
     "keywords": ["laravel", "queue"],
     "license": "MIT",
