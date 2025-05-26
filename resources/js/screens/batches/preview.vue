@@ -8,7 +8,8 @@
                 ready: false,
                 retrying: false,
                 batch: {},
-                failedJobs : []
+                failedJobs : [],
+                jobs: []
             };
         },
 
@@ -45,6 +46,7 @@
                     .then(response => {
                         this.batch = response.data.batch;
                         this.failedJobs = response.data.failedJobs;
+                        this.jobs = response.data.jobs;
 
                         this.ready = true;
                     });
@@ -157,6 +159,37 @@
                     <div class="col">{{ (batch.processedJobs) }} ({{batch.progress}}%)</div>
                 </div>
             </div>
+        </div>
+
+        <div class="card overflow-hidden mt-4" v-if="ready && jobs.length">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h2 class="h6 m-0">Jobs</h2>
+            </div>
+
+            <table class="table table-hover mb-0">
+                <thead>
+                <tr>
+                    <th>Job</th>
+                    <th class="text-end">Queued</th>
+                    <th class="text-end">Reserved</th>
+                    <th class="text-end">Completed</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr v-for="job in jobs" :key="job.id">
+                    <td>
+                        <router-link :to="{ name: 'job-preview', params: { jobId: job.id, type: 'completed' }}">
+                            {{ jobBaseName(job.name) }}
+                        </router-link>
+                    </td>
+
+                    <td class="text-end text-muted table-fit">{{ readableTimestamp(job.payload.pushedAt) }}</td>
+                    <td class="text-end text-muted table-fit">{{ job.reserved_at ? readableTimestamp(job.reserved_at) : '-' }}</td>
+                    <td class="text-end text-muted table-fit">{{ job.completed_at ? readableTimestamp(job.completed_at) : '-' }}</td>
+                </tr>
+                </tbody>
+            </table>
         </div>
 
         <div class="card overflow-hidden mt-4" v-if="ready && failedJobs.length">

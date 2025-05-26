@@ -6,6 +6,7 @@ use Illuminate\Bus\BatchRepository;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Laravel\Horizon\Contracts\JobRepository;
+use Laravel\Horizon\Contracts\TagRepository;
 use Laravel\Horizon\Jobs\RetryFailedJob;
 
 class BatchesController extends Controller
@@ -60,13 +61,25 @@ class BatchesController extends Controller
         $batch = $this->batches->find($id);
 
         if ($batch) {
-            $failedJobs = app(JobRepository::class)
-                            ->getJobs($batch->failedJobIds);
+            $jobRepository = app(JobRepository::class);
+            $failedJobs = $jobRepository->getJobs($batch->failedJobIds)->map(function ($job) {
+                $job->payload = json_decode($job->payload);
+
+                return $job;
+            });
+
+            $jobIds = app(TagRepository::class)->jobs('batch:'.$id);
+            $jobs = $jobRepository->getJobs($jobIds)->map(function ($job) {
+                $job->payload = json_decode($job->payload);
+
+                return $job;
+            });
         }
 
         return [
             'batch' => $batch,
             'failedJobs' => $failedJobs ?? null,
+            'jobs' => $jobs ?? [],
         ];
     }
 
